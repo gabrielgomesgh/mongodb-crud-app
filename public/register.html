@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Registro</title>
+    <link href="output.css" rel="stylesheet">
+    <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://kit.fontawesome.com/2ea647b60f.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header class="flex bg-black text-white justify-around h-16 items-center text-lg text-orange-800">
+        <div class="text-white">
+            <div class="flex items-center">
+                <img class="inline h-6" src="./img/logo.png" alt="" width="25px">
+                <h1 class="text-white text-2xl inline ml-2.5">
+                    RECIFUT
+                </h1>
+            </div>
+        </div>
+        <div>
+            <a href="home.html" class="hover:text-orange-600 mr-3">Home</a>
+            <a href="product.html" class="hover:text-orange-600 mr-3">Produtos</a>
+            <a href="#" class="mr-3 border-b-4 border-orange-800">Cadastros</a>
+            <a href="aboutus.html" class="hover:text-orange-600">Sobre</a>
+        </div>
+    </header>
+
+    <main class="bg-amber-900/10">
+        <section id="form" class="rounded-lg ml-auto mr-auto bg-white p-8">
+            <h1 class="text-center text-xl mb-14 font-medium">Cadastro de Cliente</h1>
+
+            <form id="registration-form">
+
+                <div class="flex flex-wrap mx-4">
+                    <div class="w-2/4">
+                        <label for="name" class="text-sm font-medium">Nome</label> <br>
+                        <input type="text" id="name" name="name" class="border-solid border-2 border-slate-200 rounded-md h-9 text-sm font-medium w-11/12 pl-4" required>
+                    </div>
+
+                    <div class="w-2/4">
+                        <label for="last_name" class="text-sm font-medium">Sobrenome</label> <br>
+                        <input type="text" id="last_name" name="last_name" class="border-solid border-2 border-slate-200 rounded-md h-9 text-sm font-medium w-11/12 pl-4" required>
+                    </div>
+
+                    <div class="w-2/4">
+                        <label for="age" class="text-sm font-medium">Idade</label> <br>
+                        <input type="number" id="age" name="age" class="border-solid border-2 border-slate-200 rounded-md h-9 text-sm font-medium w-11/12 pl-4" required>
+                    </div>
+
+                    <div class="w-2/4">
+                        <label for="email" class="text-sm font-medium">E-mail</label> <br>
+                        <input type="email" id="email" name="email" class="border-solid border-2 border-slate-200 rounded-md h-9 text-sm font-medium w-11/12 pl-4" required>
+                    </div>
+                    <button class="w-full bg-black text-white h-10 mt-11 rounded-md" type="submit">Enviar</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="users" class="rounded-lg ml-auto mr-auto bg-white p-8 mb-14">
+            <h1 class="text-center text-xl mb-14 font-medium">Lista de Clientes</h1>
+            <button type="button" class="" onclick="getRegisters()">
+                Atualizar
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+            <p id="messageError" class="text-center font-bold hidden">Não foi possível exibir os nossos clientes.</p>
+            <ul id="register-list" class="text-lg"></ul>
+        </section>
+    </main>
+    
+    <script>
+        // IMPORTS
+
+        //POST
+        document.getElementById('registration-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = {
+                name: document.getElementById('name').value,
+                last_name: document.getElementById('last_name').value,
+                age: document.getElementById('age').value,
+                email: document.getElementById('email').value
+            };
+
+            fetch('/api/registers', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                Toastify({
+                    text: "Cadastro de cliente feito com sucesso",
+                    backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+                    duration: 2000 // 2 segundos
+                }).showToast();
+                // Esvaziando o form
+                document.getElementById('name').value = '';
+                document.getElementById('last_name').value = '';
+                document.getElementById('age').value = '';
+                document.getElementById('email').value = '';
+            })
+            .catch(error => {
+                console.error('Erro ao criar registro:', error);
+                alert('Erro ao criar registro. Por favor, tente novamente.');
+            });
+        });
+
+        // GET
+        const getRegisters = () => {
+            fetch('http://localhost:3000/api/registers')
+            .then(response => response.json()) // Convertendo a resposta para JSON
+            .then(data => {
+
+                console.log(data)
+                console.log(data[0].last_name)
+                const registerList = document.getElementById('register-list');
+                registerList.innerHTML = ''
+                
+
+                // Manipulando os dados recebidos e exibindo na página
+                data.forEach(register => {
+                    const listItem = document.createElement('li');
+                    const deleteItem = document.createElement('a');
+                    const deleteIcon = document.createElement('img');
+                
+                    listItem.textContent = `${register._id}, ${register.name} ${register.last_name}, ${register.age}, ${register.email}`;
+                    deleteIcon.className = 'w-6 inline ml-2.5 pb-1.5';
+                    deleteIcon.src = '/img/trash-icon.png'
+                    deleteItem.href = '#'
+                    deleteItem.addEventListener('click', function(event){
+                        event.preventDefault();
+
+                        deleteRegister(register._id);
+                    })
+
+                    registerList.appendChild(listItem);
+                    listItem.appendChild(deleteItem);
+                    deleteItem.appendChild(deleteIcon);
+                });
+            })
+            .catch(error => {
+                // console.error('Erro ao obter registros:', error);
+                // alert('Erro ao obter registros. Por favor, tente novamente.');
+                const errorElement = document.getElementById('messageError');
+                errorElement.classList.toggle('hidden');
+            });
+        }
+        getRegisters();
+
+        // DELETE
+            const deleteRegister = (registerId) => {
+                fetch(`/api/registers/${registerId}`, {
+                method: 'DELETE'
+                })
+                .then( response => {
+                    if(response.ok) {
+                        
+                        Toastify({
+                            text: "Registro excluído com sucesso",
+                            backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+                            duration: 2000 // 2 segundos
+                        }).showToast();
+
+                    } else{
+                        console.log(`Houve um erro ao excluir registro ${registerId}`)
+                    }
+                })
+                .catch( error => {
+                    console.log("Erro ao excluir registro, erro: ", error)
+                })
+            }
+    </script>
+</body>
+</html>
+
+<style scoped>
+body{
+background-image: url(img/cristiano-ronaldo-fundo.jpg);
+}
+#form{
+    margin-top: 5rem;
+    max-width: 60vw;
+}
+#users{
+    margin-top: 2rem;
+    max-width: 60vw;
+}
+</style>

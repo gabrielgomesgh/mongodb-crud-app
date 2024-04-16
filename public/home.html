@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recifut PE</title>
+    <link href="output.css" rel="stylesheet">
+    <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
+</head>
+<body>
+
+    <header class="flex bg-black text-white justify-around h-16 items-center text-lg text-orange-800">
+        <div class="text-white">
+            <div class="flex items-center">
+                <img class="inline h-6" src="./img/logo.png" alt="" width="25px">
+                <h1 class="text-white text-2xl inline ml-2.5">
+                    RECIFUT
+                </h1>
+            </div>
+        </div>
+        <div>
+            <a href="#" class="mr-3 border-b-4 border-orange-800">Home</a>
+            <a href="product.html" class="hover:text-orange-600 mr-3">Produtos</a>
+            <a href="register.html" class="hover:text-orange-600 mr-3">Cadastros</a>
+            <a href="aboutus.html" class="hover:text-orange-600">Sobre</a>
+        </div>
+    </header>
+
+    <main class="mb-14">
+        <section id="banner" class="">
+
+            <div class="flex flex-row h-full mx-24 items-center p-10">
+
+                <div class="basis-1/2"></div>
+
+                <div class="text-white basis-1/2">
+                    <h2 class="font-extrabold text-6xl">Vamos jogar juntos</h2>
+                    <h4 class="mt-6 ml-2 text-lg">Oferecemos as camisas de mais alta tecnologia para que atletas como você deem seu melhor dentro de campo. Confira abaixo os produtos que farão você brilhar em campo.</h4>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section id="produtos" class="ml-auto mr-auto">
+            <h1 class="text-4xl m-10 text-center font-bold">Nossos Produtos</h1>
+            <div id="product-list" class="flex flex-wrap gap-x-10 justify-center"></div>
+            <p id="messageError" class="text-center font-bold hidden">Não foi possível estabelecer conexão com os produtos do nosso banco de dados</p>
+        </section>
+    </main>
+
+    <footer class="flex items-center justify-center bg-black h-9 text-white text-center">
+        <p>@2024 Recifut: Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+         // Fazendo uma requisição GET para a API de produtos
+         fetch('http://localhost:3000/api/products')
+        .then(response => response.json()) // Convertendo a resposta para JSON
+        .then(data => {
+            // Manipulando os dados recebidos e criando elementos HTML para cada produto
+            const productList = document.getElementById('product-list');
+            data.forEach(product => {
+                // Criando elementos HTML para o produto
+                const productDiv = document.createElement('div');
+                const imageElement = document.createElement('img');
+                const title = document.createElement('p');
+                const price = document.createElement('p');
+                const description = document.createElement('p');
+                
+                // Definindo os atributos e conteúdo dos elementos
+                productDiv.className = 'max-w-48 mt-6';
+                if (product.image) {
+                    imageElement.src = product.image;
+                } else{
+                    imageElement.src = `./img/shirt-model.jpg`;
+                }
+                title.textContent = product.name;
+                title.className = 'text-center font-semibold text-xl'
+                price.textContent = `R$ ${product.price},00`;
+                price.className = 'text-center font-semibold'
+                description.className = 'text-center';
+                description.textContent = product.Description;
+                
+                // Adicionando os elementos ao contêiner principal
+                productDiv.appendChild(imageElement);
+                productDiv.appendChild(title);
+                productDiv.appendChild(price);
+                productDiv.appendChild(description);
+                productList.appendChild(productDiv);
+            });
+        })
+        .catch(error => {
+            // console.error('Erro ao obter produtos:', error);
+            // alert('Erro ao obter produtos. Por favor, tente novamente.');
+            const errorElement = document.getElementById('messageError');
+            errorElement.classList.toggle('hidden');
+
+        });
+    </script>
+</body>
+</html>
+
+<style>
+#banner{
+    height: 35rem;
+    min-height: 3rem;
+    background-image: url(img/cristiano-ronaldo4.jpg);
+    background-color: black;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+#produtos{
+    margin-top: 10px;
+    max-width: 62vw;
+}
+</style>

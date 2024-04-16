@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Produto</title>
+    <link href="output.css" rel="stylesheet">
+    <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</head>
+<body>
+    <header class="flex bg-black text-white justify-around h-16 items-center text-lg text-orange-800">
+        <div class="text-white">
+            <div class="flex items-center">
+                <img class="inline h-6" src="./img/logo.png" alt="" width="25px">
+                <h1 class="text-white text-2xl inline ml-2.5">
+                    RECIFUT
+                </h1>
+            </div>
+        </div>
+        <div>
+            <a href="home.html" class="hover:text-orange-600 mr-3">Home</a>
+            <a href="#" class="mr-3 border-b-4 border-orange-800">Produtos</a>
+            <a href="register.html" class="hover:text-orange-600 mr-3">Cadastros</a>
+            <a href="aboutus.html" class="hover:text-orange-600">Sobre</a>
+        </div>
+    </header>
+
+    <main class="bg-amber-900/10">
+        <section id="form" class="rounded-lg ml-auto mr-auto bg-white p-8">
+            <h1 class="text-center text-xl mb-14 font-medium">Cadastro de Produto</h1>
+
+            <form id="registration-form">
+
+                <div class="flex flex-wrap gap-y-2.5 mx-4">
+
+                    <div class="w-2/4">
+                        <label for="name" class="text-sm font-medium">Nome do Produto</label> <br>
+                        <input type="text" id="name" name="name" class="border-solid border-2 border-slate-200 rounded-md h-9 text-sm font-medium w-full pl-4" required>
+                    </div>
+
+                    <div class="w-1/4">
+                        <label for="quantity" class="text-sm font-medium">Quantidade</label> <br>
+                        <input type="number" id="quantity" name="quantity" class="border-solid border-2 border-slate-200 rounded-md h-9 text-sm font-medium pl-4 ml-2" required>
+                    </div>
+
+                    <div class="w-1/4">
+                        <label for="price" class="text-sm font-medium">Preço</label> <br>
+                        <input type="number" id="price" name="price" class="border-solid border-2 border-slate-200 rounded-md h-9 text-sm font-medium pl-4" required>
+                    </div>
+
+                    <div class="basis-full">
+                        <label for="image" class="text-sm font-medium">Url da imagem do produto</label> <br>
+                        <input type="url" id="image" name="image" class="border-solid border-2 border-slate-200 rounded-md h-9 text-sm font-medium pl-4 w-full">
+                    </div>
+
+                    <div class="basis-full">
+                        <label for="Description" class="text-sm font-medium">Descrição</label> <br>
+                        <textarea name="Description" id="Description" class="border-solid border-2 border-slate-200 rounded-md text-sm pl-2 h-20 pt-2 w-full" required></textarea>
+                    </div>
+                    <button class="w-full bg-black text-white h-10 mt-11 rounded-md" type="submit">Enviar</button>
+                </div>
+            </form>
+
+        </section>
+
+        <section id="products" class="rounded-lg ml-auto mr-auto bg-white p-8 mb-14">
+            <h1 class="text-center text-xl mb-14 font-medium">Produtos</h1>
+            <p id="messageError" class="text-center font-bold hidden">Não foi possível exibir os produtos do nosso banco de dados</p>
+            <ul id="products-list" class="text-lg"></ul>
+        </section>
+    </main>
+
+    <script>
+        // POST
+        document.getElementById('registration-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = {
+                name: document.getElementById('name').value,
+                quantity: document.getElementById('quantity').value,
+                price: document.getElementById('price').value,
+                image: document.getElementById('image').value,
+                Description: document.getElementById('Description').value
+            };
+
+            fetch('/api/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                Toastify({
+                    text: "Produto criado com sucesso",
+                    backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+                    duration: 2000 // 2 segundos
+                }).showToast();
+            })
+            .catch(error => {
+                console.error('Erro ao criar registro:', error);
+                alert('Erro ao criar registro. Por favor, tente novamente.');
+            });
+        });
+
+        //GET
+        fetch('/api/products')
+        .then(response => response.json())
+        .then( data => {
+
+            // Manipulando os dados recebidos e exibindo na página
+            const productList = document.getElementById('products-list')
+            data.forEach(product => {
+                const listItem = document.createElement('li');
+                const deleteItem = document.createElement('a');
+                const deleteIcon = document.createElement('img');
+
+                deleteItem.className = 'delete-item'
+                deleteItem.href = '#'
+                deleteItem.addEventListener('click', function(event) {
+                    event.preventDefault();
+
+                    deleteItemFunction(product._id)
+                })
+                deleteIcon.src = './img/trash-icon.png'
+                deleteIcon.className = 'w-6 inline ml-2.5 pb-1.5'
+                listItem.textContent = `${product.name}, Descrição: ${product.Description} R$${product.price},00`
+
+                productList.appendChild(listItem)
+                listItem.appendChild(deleteItem);
+                deleteItem.appendChild(deleteIcon);
+            })
+
+        })
+        .catch( error => {
+            // console.error("Não foi possível obter os produtos", error);
+            const errorElement = document.getElementById('messageError');
+            errorElement.classList.toggle('hidden');
+        })
+
+        // DELETE
+        const deleteItemFunction = (itemId) => {
+            // Fazendo uma requisição DELETE para a API
+            fetch(`http://localhost:3000/api/products/${itemId}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    Toastify({
+                        text: "Produto excluido com sucesso",
+                        backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+                        duration: 2000 // 2 segundos
+                    }).showToast();
+                } else {
+                    console.error('Erro ao excluir o item:', response.statusText);
+                    // Tratar o erro de acordo com a sua necessidade
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao excluir o item:', error);
+                // Tratar o erro de acordo com a sua necessidade
+            });
+        };
+
+        // UPDATE
+
+    </script>
+</body>
+</html>
+
+<style scoped>
+body{
+    background-image: url(img/cristiano-ronaldo-fundo.jpg);
+}
+#form{
+    margin-top: 5rem;
+    max-width: 60vw;
+}
+#products{
+    margin-top: 2rem;
+    max-width: 60vw;
+}
+</style>
