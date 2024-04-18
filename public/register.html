@@ -92,7 +92,8 @@
                 body: JSON.stringify(formData)
             })
             .then(response => response.json())
-            .then(data => {
+            .then(() => {
+                getRegisters(); // refresh registers
                 Toastify({
                     text: "Cadastro de cliente feito com sucesso",
                     backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
@@ -115,20 +116,16 @@
             fetch('http://localhost:3000/api/registers')
             .then(response => response.json()) // Convertendo a resposta para JSON
             .then(data => {
-
-                console.log(data)
-                console.log(data[0].last_name)
                 const registerList = document.getElementById('register-list');
-                registerList.innerHTML = ''
+                registerList.innerHTML = '';
                 
-
                 // Manipulando os dados recebidos e exibindo na página
                 data.forEach(register => {
                     const listItem = document.createElement('li');
                     const deleteItem = document.createElement('a');
                     const deleteIcon = document.createElement('img');
                 
-                    listItem.textContent = `${register._id}, ${register.name} ${register.last_name}, ${register.age}, ${register.email}`;
+                    listItem.textContent = `${register.name} ${register.last_name}, ${register.age}, ${register.email}`;
                     deleteIcon.className = 'w-6 inline ml-2.5 pb-1.5';
                     deleteIcon.src = '/img/trash-icon.png'
                     deleteItem.href = '#'
@@ -159,7 +156,7 @@
                 })
                 .then( response => {
                     if(response.ok) {
-                        
+                        getProducts();
                         Toastify({
                             text: "Registro excluído com sucesso",
                             backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",

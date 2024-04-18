@@ -8,6 +8,7 @@
     <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://kit.fontawesome.com/2ea647b60f.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <header class="flex bg-black text-white justify-around h-16 items-center text-lg text-orange-800">
@@ -67,6 +68,10 @@
 
         <section id="products" class="rounded-lg ml-auto mr-auto bg-white p-8 mb-14">
             <h1 class="text-center text-xl mb-14 font-medium">Produtos</h1>
+            <button type="button" class="" onclick="getProducts()">
+                Atualizar
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
             <p id="messageError" class="text-center font-bold hidden">Não foi possível exibir os produtos do nosso banco de dados</p>
             <ul id="products-list" class="text-lg"></ul>
         </section>
@@ -93,12 +98,21 @@
                 body: JSON.stringify(formData)
             })
             .then(response => response.json())
-            .then(data => {
+            .then(() => {
+                getProducts(); // refresh products
                 Toastify({
                     text: "Produto criado com sucesso",
                     backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
                     duration: 2000 // 2 segundos
                 }).showToast();
+            })
+            .then(() => {
+                // Esvaziando o form
+                document.getElementById('name').value = '';
+                document.getElementById('quantity').value = '';
+                document.getElementById('price').value = '';
+                document.getElementById('image').value = '';
+                document.getElementById('Description').value = '';
             })
             .catch(error => {
                 console.error('Erro ao criar registro:', error);
@@ -107,39 +121,43 @@
         });
 
         //GET
-        fetch('/api/products')
-        .then(response => response.json())
-        .then( data => {
+        const getProducts = () => {
+            fetch('/api/products')
+            .then(response => response.json())
+            .then( data => {
+                const productList = document.getElementById('products-list');
+                productList.innerHTML = '';
 
-            // Manipulando os dados recebidos e exibindo na página
-            const productList = document.getElementById('products-list')
-            data.forEach(product => {
-                const listItem = document.createElement('li');
-                const deleteItem = document.createElement('a');
-                const deleteIcon = document.createElement('img');
+                // Manipulando os dados recebidos e exibindo na página
+                data.forEach(product => {
+                    const listItem = document.createElement('li');
+                    const deleteItem = document.createElement('a');
+                    const deleteIcon = document.createElement('img');
 
-                deleteItem.className = 'delete-item'
-                deleteItem.href = '#'
-                deleteItem.addEventListener('click', function(event) {
-                    event.preventDefault();
+                    deleteItem.className = 'delete-item'
+                    deleteItem.href = '#'
+                    deleteItem.addEventListener('click', function(event) {
+                        event.preventDefault();
 
-                    deleteItemFunction(product._id)
+                        deleteItemFunction(product._id)
+                    })
+                    deleteIcon.src = './img/trash-icon.png'
+                    deleteIcon.className = 'w-6 inline ml-2.5 pb-1.5'
+                    listItem.textContent = `${product.name}, Descrição: ${product.Description} R$${product.price},00`
+
+                    productList.appendChild(listItem)
+                    listItem.appendChild(deleteItem);
+                    deleteItem.appendChild(deleteIcon);
                 })
-                deleteIcon.src = './img/trash-icon.png'
-                deleteIcon.className = 'w-6 inline ml-2.5 pb-1.5'
-                listItem.textContent = `${product.name}, Descrição: ${product.Description} R$${product.price},00`
 
-                productList.appendChild(listItem)
-                listItem.appendChild(deleteItem);
-                deleteItem.appendChild(deleteIcon);
             })
-
-        })
-        .catch( error => {
-            // console.error("Não foi possível obter os produtos", error);
-            const errorElement = document.getElementById('messageError');
-            errorElement.classList.toggle('hidden');
-        })
+            .catch( error => {
+                // console.error("Não foi possível obter os produtos", error);
+                const errorElement = document.getElementById('messageError');
+                errorElement.classList.toggle('hidden');
+            })
+        }
+        getProducts();
 
         // DELETE
         const deleteItemFunction = (itemId) => {
@@ -149,6 +167,7 @@
             })
             .then(response => {
                 if (response.ok) {
+                    getProducts();
                     Toastify({
                         text: "Produto excluido com sucesso",
                         backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
