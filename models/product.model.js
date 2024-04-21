@@ -19,6 +19,12 @@ const productSchema = mongoose.Schema(
             default: 0
         },
 
+        category: {
+            type: Number,
+            required: true,
+            default: 0
+        },        
+
         Description: {
             type: String,
             require: 0

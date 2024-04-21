@@ -156,7 +156,7 @@
                 })
                 .then( response => {
                     if(response.ok) {
-                        getProducts();
+                        getRegisters();
                         Toastify({
                             text: "Registro excluído com sucesso",
                             backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
@@ -164,6 +164,12 @@
                         }).showToast();
 
                     } else{
+                        Toastify({
+                            text: "Houve um erro ao excluir registro",
+                            backgroundColor: "red",
+                            duration: 2000 // 2 segundos
+                        }).showToast();
+
                         console.log(`Houve um erro ao excluir registro ${registerId}`)
                     }
                 })

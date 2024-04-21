@@ -44,6 +44,10 @@
 
         <section id="produtos" class="ml-auto mr-auto">
             <h1 class="text-4xl m-10 text-center font-bold">Nossos Produtos</h1>
+            <div id="searchBox" class="flex justify-center hidden">
+                <input class="w-1/2 p-3 rounded-xl border shadow-lg" type="text" placeholder="O que você deseja encontrar?">
+            </div>
+            
             <div id="product-list" class="flex flex-wrap gap-x-10 justify-center"></div>
             <p id="messageError" class="text-center font-bold hidden">Não foi possível estabelecer conexão com os produtos do nosso banco de dados</p>
         </section>
@@ -60,6 +64,10 @@
         .then(data => {
             // Manipulando os dados recebidos e criando elementos HTML para cada produto
             const productList = document.getElementById('product-list');
+            // Exibir caixa de pesquisa de produtos
+            const searchBox = document.getElementById('searchBox');
+            searchBox.classList.toggle('hidden');
+
             data.forEach(product => {
                 // Criando elementos HTML para o produto
                 const productDiv = document.createElement('div');
@@ -95,7 +103,28 @@
             // alert('Erro ao obter produtos. Por favor, tente novamente.');
             const errorElement = document.getElementById('messageError');
             errorElement.classList.toggle('hidden');
+        });
 
+        // SEARCH INPUT
+        function filterProducts(searchTerm) {
+            const productList = document.getElementById('product-list');
+            const products = productList.getElementsByClassName('max-w-48'); // Obtém todos os elementos de produto
+
+            // Loop através de todos os produtos e exibe ou oculta com base no termo de pesquisa
+            Array.from(products).forEach(product => {
+                const title = product.querySelector('p.text-center.font-semibold.text-xl').textContent.toLowerCase(); // Obtém o texto do título do produto
+
+                if (title.includes(searchTerm.toLowerCase())) {
+                    product.style.display = 'block'; // Exibe o produto se o título corresponder ao termo de pesquisa
+                } else {
+                    product.style.display = 'none'; // Oculta o produto se o título não corresponder ao termo de pesquisa
+                }
+            });
+        }
+        // Adiciona um evento de escuta para o evento 'input' no campo de pesquisa
+        const searchInput = document.querySelector('#searchBox input[type="text"]');
+        searchInput.addEventListener('input', function() {
+            filterProducts(this.value); // Chama a função de filtragem de produtos com o valor atual do campo de pesquisa
         });
     </script>
 </body>

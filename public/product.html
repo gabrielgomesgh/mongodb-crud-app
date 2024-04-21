@@ -51,9 +51,19 @@
                         <input type="number" id="price" name="price" class="border-solid border-2 border-slate-200 rounded-md h-9 text-sm font-medium pl-4" required>
                     </div>
 
-                    <div class="basis-full">
+                    <div class="w-3/4">
                         <label for="image" class="text-sm font-medium">Url da imagem do produto</label> <br>
                         <input type="url" id="image" name="image" class="border-solid border-2 border-slate-200 rounded-md h-9 text-sm font-medium pl-4 w-full">
+                    </div>
+
+                    <div class="w-1/4">
+                        <label for="category" class="text-sm font-medium">Categoria do produto</label> <br>
+                        <select class="border-solid border-2 border-slate-200 rounded-md h-9 text-sm pl-2 font-medium" name="category" id="category">
+                            <option value="0">Não se aplica</option>
+                            <option value="1">Brasileiro</option>
+                            <option value="2">Estrangeiro</option>
+                            <option value="3">Seleção</option>
+                        </select>
                     </div>
 
                     <div class="basis-full">
@@ -87,6 +97,7 @@
                 quantity: document.getElementById('quantity').value,
                 price: document.getElementById('price').value,
                 image: document.getElementById('image').value,
+                category: document.getElementById('category').value,
                 Description: document.getElementById('Description').value
             };
 
@@ -112,6 +123,7 @@
                 document.getElementById('quantity').value = '';
                 document.getElementById('price').value = '';
                 document.getElementById('image').value = '';
+                document.getElementById('category').value = '';
                 document.getElementById('Description').value = '';
             })
             .catch(error => {
